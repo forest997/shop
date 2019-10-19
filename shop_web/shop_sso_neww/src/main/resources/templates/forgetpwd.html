@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base th:href="|${#request.getContextPath()}/resources/|"/>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="js/jquery.js" ></script>
+    <script>
+        var time = 5;
+        function sendEmail(btn) {
+            var username = $("#username").val();
+           if(username!=null&&username.trim()!=""){
+               $.ajax({
+                   type:"POST",
+                   url:"http://localhost:16666/sso/forgetPassword",
+                   data:{"username":username},
+                   dataType:"json",
+                   success:function (data) {
+                    if(data.code=="0000"){
+                        $(btn).removeAttr("disabled");
+                        $(btn).html("发送邮件");
+                        $("#sendTip").html(data.msg);
+
+                    }else if(data.code=="0001"){
+                        $("#sendTip").html("邮件已发送至"+data.data.emailInfo+",请<a href='"+data.data.emailUrl+"'>查收</a>");
+                        btnHandler(btn);
+                    }else {
+                        $("#sendTip").html(data.msg);
+                    }
+                   }
+               })
+           }
+        }
+        function btnHandler(btn) {
+            if(time==-1){
+                $(btn).removeAttr("disabled");
+                $(btn).html("重新发送邮件");
+                time = 5;
+                return;
+            }
+            $(btn).attr("disabled", "disabled");
+            $(btn).html("重新发送邮件("+time+"s)");
+            setTimeout(function () {
+                time--;
+                btnHandler(btn);
+            },1000)
+
+        }
+    </script>
+</head>
+<body>
+<h1>找回密码</h1>
+用户名:<input type="text" name="username" id="username"/>
+<br/>
+<button id="send" onclick="sendEmail(this)">发送邮件</button><span id="sendTip"></span>
+</body>
+</html>

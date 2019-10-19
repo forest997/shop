@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base th:href="|${#request.getContextPath()}/back/|"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Insert title here</title>
+    <!-- Invalid Stylesheet. This makes stuff look pretty. Remove it if you want the CSS completely valid -->
+    <!-- Reset Stylesheet -->
+    <link rel="stylesheet" href="resources/css/reset.css" type="text/css"
+          media="screen"/>
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="resources/css/style.css" type="text/css"
+          media="screen"/>
+    <link rel="stylesheet" href="resources/css/invalid.css" type="text/css"
+          media="screen"/>
+
+    <!--                       Javascripts                       -->
+    <!-- jQuery -->
+    <script type="text/javascript"
+            src="resources/scripts/jquery-1.8.3.min.js"></script>
+    <!-- jQuery Configuration -->
+    <!--    弹窗插件-->
+    <link rel="stylesheet" href="//apps.bdimg.com/libs/jqueryui/1.10.4/css/jquery-ui.min.css">
+    <script type="text/javascript" src="resources/widget/dialog/jquery-ui-1.9.2.custom.min.js"></script>
+    <!--    上传控件-->
+    <link rel="stylesheet" href="resources/widget/webuploader/webuploader.css"/>
+    <script type="text/javascript" src="resources/widget/webuploader/webuploader.min.js"></script>
+    <script>
+        $(function () {
+            var uploader1 = WebUploader.create({
+                // 选完文件后，是否自动上传。
+                auto: true,
+                // swf文件路径
+                swf: 'resources/widget/webuploader/Uploader.swf',
+                // 文件接收服务端。
+                server: 'goodsManager/uploader',
+                // 选择文件的按钮。可选。
+                // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+                pick: '#filePicker1'
+            });
+
+            uploader1.on('uploadSuccess', function (file, response) {
+                var filename = response.filename;
+                $("#img_cover")[0].innerHTML = "<img id='img_cover' src='"+filename+"' style='width: 100px; height: 90px'/>";
+                $("#coverImg").attr("value",filename);
+            });
+        });
+
+        $(function () {
+            var flag = 0;
+            var uploader2 = WebUploader.create({
+                // 选完文件后，是否自动上传。
+                auto: true,
+                // swf文件路径
+                swf: 'resources/widget/webuploader/Uploader.swf',
+                // 文件接收服务端。
+                server: 'goodsManager/uploader',
+                // 选择文件的按钮。可选。
+                // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+                pick: '#filePicker2'
+            });
+            uploader2.on('uploadSuccess', function (file, response) {
+                var filename = response.filename;
+                if(flag==0){
+                    $("#img_other")[0].innerHTML = " <div id='img_others' style='width: 100%; height: 200px; border: lightgrey solid 1px;'></div>";
+                }
+                flag++;
+                var html="<img src='"+filename+"' style='width: 100px; height: 90px;margin: 5px'/><input name='otherImg' type='hidden' value='"+filename+"'/>";
+                $("#img_others").append(html);
+                // $("#coverImg").attr("value",filename);
+            });
+        });
+
+        function dialog_addgoods() {
+            $("#goodsadd_div").dialog({
+                title: "添加商品",
+                width: 800,
+                height: 700,
+                // 弹出框后面页面变灰且不可操作
+                modal: true
+            });
+        }
+    </script>
+</head>
+<body>
+<div id="main-content">
+    <div class="content-box">
+        <!-- End .content-box-header -->
+        <div class="content-box-content">
+            <div class="tab-content default-tab" id="tab1">
+                <table>
+                    <thead>
+                    <tr>
+                        <th><input class="check-all" type="checkbox"/></th>
+                        <th>编号</th>
+                        <th>商品标题</th>
+                        <th>图片(封面)</th>
+                        <th>商品详情</th>
+                        <th>单价</th>
+                        <th>库存</th>
+                        <th>创建时间</th>
+                    </tr>
+                    </thead>
+                    <tfoot>
+                    <tr>
+                        <td colspan="6">
+                            <div class="bulk-actions align-left">
+                                <a class="mybutton" onclick="dialog_addgoods()">添加商品</a>
+                            </div>
+                            <div class="pagination">
+                                <a href="#" title="First Page">&laquo; First</a><a href="#"
+                                                                                   title="Previous Page">&laquo;
+                                Previous</a> <a href="#"
+                                                class="number" title="1">1</a> <a href="#" class="number"
+                                                                                  title="2">2</a> <a href="#"
+                                                                                                     class="number current"
+                                                                                                     title="3">3</a>
+                                <a href="#" class="number" title="4">4</a> <a href="#"
+                                                                              title="Next Page">Next &raquo;</a><a
+                                    href="#"
+                                    title="Last Page">Last &raquo;</a>
+                            </div> <!-- End .pagination -->
+                            <div class="clear"></div>
+                        </td>
+                    </tr>
+                    </tfoot>
+                    <tbody>
+                    <tr th:each="goods : ${goodsList}">
+                        <td><input type="checkbox"/></td>
+                        <td th:text="${goods.id}">Lorem ipsum dolor</td>
+                        <td th:text="${goods.subject}">Lorem ipsum dolor</td>
+                        <td th:each="goodsImage : ${goods.goodsImageList}" th:if="${goodsImage.iscover==1}"><img th:src="${goodsImage.url}" style="width: 100px;height: 90px"/></td>
+                        <td th:text="${goods.info}">Lorem ipsum dolor</td>
+                        <td th:text="${#numbers.formatCurrency(goods.price.doubleValue())}">Lorem ipsum dolor</td>
+                        <td th:text="${goods.save}"></td>
+                        <td th:text="${#dates.format(goods.createTime,'yyyy-MM-dd HH:ss:mm')}">Lorem ipsum dolor</td>
+                        <td>
+                            <!-- Icons --> <a href="#" title="Edit"><img
+                                src="resources/images/icons/pencil.png" alt="Edit"/></a> <a
+                                href="#" title="Delete"><img
+                                src="resources/images/icons/cross.png" alt="Delete"/></a> <a
+                                href="#" title="Edit Meta"><img
+                                src="resources/images/icons/hammer_screwdriver.png"
+                                alt="Edit Meta"/></a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- End .content-box-content -->
+    </div>
+</div>
+<div id="goodsadd_div" style="display: none">
+    <div class="content-box">
+        <div class="content-box-content">
+            <div class="tab-content default-tab" id="tab2">
+                <form action="goodsManager/insert" method="post">
+                    <fieldset>
+                        <!-- Set class to "column-left" or "column-right" on fieldsets to divide the form into columns -->
+                        <p>
+                            <label>商品标题</label> <input
+                                class="text-input medium-input" type="text" id="subject"
+                                name="subject"/>
+
+                        </p>
+                        <p>
+                            <label>封面图片</label>
+                        <div id="filePicker1">选择图片</div>
+                        <div id="img_cover"></div>
+                        <input type="hidden" name="coverImg" id="coverImg" value=""/>
+
+                        </p>
+                        <p>
+                            <label>其他图片</label>
+                        <div id="filePicker2">选择图片</div>
+                       <div id="img_other"></div>
+                        </p>
+                        <p>
+                            <label>单价</label> <input
+                                class="text-input small-input" type="text" id="price"
+                                name="price"/>
+                        </p>
+                        <p>
+                            <label>库存</label> <input
+                                class="text-input small-input" type="text" id="save"
+                                name="save"/>
+                        </p>
+                        <p>
+                            <label>商品详情介绍</label>
+                            <textarea class="text-input textarea wysiwyg" id="info"
+                                      name="info" cols="79" rows="15"></textarea>
+                        </p>
+                        <p>
+                            <input class="mybutton" type="submit" value="添加"/>
+                        </p>
+                    </fieldset>
+                    <div class="clear"></div>
+                    <!-- End .clear -->
+                </form>
+            </div>
+            <!-- End #tab2 -->
+        </div>
+        <!-- End .content-box-content -->
+    </div>
+</div>
+</body>
+</html>

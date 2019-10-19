@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>重置密码</h1>
+<form action="http://localhost:16666/sso/resetPassword" method="post">
+    <input type="hidden" name="token" th:value="${#request.getParameter('token')}"/>
+新密码:<input type="text" name="newPassword"/>
+<br/>
+确认密码:<input type="text" name="surePassword"/>
+<br/>
+<input type="submit" value="重置密码"/>
+</form>
+</body>
+</html>
